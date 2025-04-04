@@ -1,5 +1,5 @@
 import { FunctionComponent } from "react";
-import { Card } from "../../interfaces/cards/cards";
+import { Card } from "../../interfaces/cards/Card";
 
 interface BusinessCardProps {
   card: Card;

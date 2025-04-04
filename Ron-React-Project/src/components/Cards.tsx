@@ -1,13 +1,14 @@
 import { FunctionComponent, useEffect, useState } from "react";
 import { getAllCards } from "../services/cardsService";
-import { Card } from "../interfaces/cards/cards";
 import BusinessCard from "./cards/BusinessCard";
-interface CardsProps {}
+import { Card } from "../interfaces/cards/Card";
+interface CardsProps {
+  decodedToken: any;
+}
 
-const Cards: FunctionComponent<CardsProps> = () => {
+const Cards: FunctionComponent<CardsProps> = ({ decodedToken }) => {
   const [cards, setCards] = useState<Card[]>([]);
   const [isCardLoading, setIsCardLoading] = useState<boolean>(true);
-
   useEffect(() => {
     getAllCards()
       .then((res) => {
@@ -27,6 +28,7 @@ const Cards: FunctionComponent<CardsProps> = () => {
       ) : (
         <div className="container">
           <div className="row d-flex justify-content-center">
+            <h3>{decodedToken?._id}</h3>
             {cards.map((card: Card) => (
               <BusinessCard key={card._id} card={card} />
             ))}

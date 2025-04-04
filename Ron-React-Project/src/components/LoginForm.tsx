@@ -1,11 +1,40 @@
 import { FormikValues, useFormik } from "formik";
 import { FunctionComponent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import * as yup from "yup";
+import { login } from "../services/authService";
+import { formatAuthForServer } from "../utils/auth/formatAuthForServer";
+import { errorMessage, successMessage } from "../utils/ui/alert";
 
-interface LoginFormProps {}
+interface LoginFormProps {
+  loginEvent: () => void;
+}
 
-const LoginForm: FunctionComponent<LoginFormProps> = () => {
+const LoginForm: FunctionComponent<LoginFormProps> = ({ loginEvent }) => {
+  const navigate = useNavigate();
+  const handleSubmit = async (values: FormikValues) => {
+    let authResponse = null;
+    try {
+      let auth = formatAuthForServer(values);
+      authResponse = await login(auth);
+      if (authResponse.status === 200) {
+        localStorage.setItem("token", JSON.stringify(authResponse.data));
+        successMessage("login successfully");
+        navigate("/cards");
+        loginEvent();
+      } else {
+        errorMessage("failed to login");
+      }
+    } catch (err: any) {
+      console.log(err);
+      if (err.response.data)
+        errorMessage(`failed to login - ${err.response.data}`);
+      else {
+        errorMessage(`failed to login`);
+      }
+    }
+  };
+
   const formik: FormikValues = useFormik({
     initialValues: {
       email: "",
@@ -21,15 +50,13 @@ const LoginForm: FunctionComponent<LoginFormProps> = () => {
       password: yup.string().min(7).max(20).required("Password is required"),
       rememberMe: yup.boolean(),
     }),
-    onSubmit: (values) => {
-      console.log(values);
-    },
+    onSubmit: handleSubmit,
   });
   return (
     <>
       <div className="w-50 mx-auto py-3">
         <h1 className="display-1 text-center mb-4">Login</h1>
-        <form>
+        <form onSubmit={formik.handleSubmit}>
           <div className="form-floating mb-3">
             <input
               type="email"

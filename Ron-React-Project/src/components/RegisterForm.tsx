@@ -1,21 +1,81 @@
 import { FormikValues, useFormik } from "formik";
 import { FunctionComponent } from "react";
 import * as yup from "yup";
+import { formatUserForServer } from "../utils/users/formatUserForServer";
+import { createUser } from "../services/usersService";
+import { errorMessage, successMessage } from "../utils/ui/alert";
+import { useNavigate } from "react-router-dom";
 
 interface RegisterFormProps {}
 
 const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
+  const navigate = useNavigate();
+  const handleSubmit = async (values: FormikValues) => {
+    let createUserResponse = null;
+    try {
+      let user = formatUserForServer(values);
+      createUserResponse = await createUser(user);
+
+      if (createUserResponse.status === 201) {
+        successMessage("user created successfully");
+        navigate("/login");
+      } else {
+        errorMessage("failed to create user");
+      }
+    } catch (err: any) {
+      console.log(err);
+      if (err.response.data)
+        errorMessage(`failed to create user - ${err.response.data}`);
+      else {
+        errorMessage(`failed to create user`);
+      }
+    }
+  };
+
   const formik: FormikValues = useFormik<FormikValues>({
-    initialValues: {},
-    validationSchema: yup.object({}),
-    onSubmit: () => {},
+    initialValues: {
+      first: "",
+      middle: "",
+      last: "",
+      phone: "",
+      email: "",
+      password: "",
+
+      image: "",
+      alt: "",
+      state: "",
+      country: "",
+      city: "",
+      street: "",
+      houseNumber: "",
+      zip: "",
+      isBusiness: false,
+    },
+    validationSchema: yup.object({
+      first: yup.string().min(2).max(256).required(),
+      middle: yup.string().min(2).max(256),
+      last: yup.string().min(2).max(256).required(),
+      phone: yup.string().min(9).max(11).required(),
+      email: yup.string().email().min(5).required(),
+      password: yup.string().min(7).max(20).required(),
+      image: yup.string().min(14),
+      alt: yup.string().min(2).max(256),
+      state: yup.string().min(2).max(256),
+      country: yup.string().min(2).max(256).required(),
+      city: yup.string().min(2).max(256).required(),
+      street: yup.string().min(2).max(256).required(),
+      houseNumber: yup.number().min(2).max(256).required(),
+      zip: yup.string().min(2).max(256).required(),
+      isBusiness: yup.boolean().required(),
+    }),
+    onSubmit: handleSubmit,
   });
 
   return (
     <>
       <div className="w-50 mx-auto py-3">
         <h1 className="display-1 text-center mb-4">Register</h1>
-        <form>
+        <form onSubmit={formik.handleSubmit}>
           <div className="row g-3">
             <div className="col-md">
               <div className="form-floating mb-3">
@@ -26,8 +86,14 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
                   placeholder="Jhon"
                   name="first"
                   required
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.first}
                 />
                 <label htmlFor="firstName">First Name</label>
+                {formik.touched.first && formik.errors.first && (
+                  <p className="text-danger">{formik.errors.first}</p>
+                )}
               </div>
             </div>
             <div className="col-md">
@@ -38,8 +104,14 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
                   id="middleName"
                   placeholder=""
                   name="middle"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.middle}
                 />
                 <label htmlFor="middleName">Middle Name</label>
+                {formik.touched.middle && formik.errors.middle && (
+                  <p className="text-danger">{formik.errors.middle}</p>
+                )}
               </div>
             </div>
             <div className="col-md">
@@ -51,8 +123,14 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
                   placeholder="Doe"
                   name="last"
                   required
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.last}
                 />
                 <label htmlFor="lastName">Last Name</label>
+                {formik.touched.last && formik.errors.last && (
+                  <p className="text-danger">{formik.errors.last}</p>
+                )}
               </div>
             </div>
           </div>
@@ -67,8 +145,14 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
                   placeholder="+972"
                   name="phone"
                   required
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.phone}
                 />
                 <label htmlFor="tel">Phone</label>
+                {formik.touched.phone && formik.errors.phone && (
+                  <p className="text-danger">{formik.errors.phone}</p>
+                )}
               </div>
             </div>
 
@@ -81,8 +165,14 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
                   placeholder="jhon@doe.com"
                   name="email"
                   required
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.email}
                 />
                 <label htmlFor="email">Email</label>
+                {formik.touched.email && formik.errors.email && (
+                  <p className="text-danger">{formik.errors.email}</p>
+                )}
               </div>
             </div>
           </div>
@@ -97,12 +187,18 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
                   placeholder=""
                   name="password"
                   required
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.password}
                 />
                 <label htmlFor="password">Password</label>
+                {formik.touched.password && formik.errors.password && (
+                  <p className="text-danger">{formik.errors.password}</p>
+                )}
               </div>
             </div>
 
-            <div className="col-md">
+            {/* <div className="col-md">
               <div className="form-floating mb-3">
                 <input
                   type="password"
@@ -111,10 +207,19 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
                   placeholder=""
                   name="confirmPassword"
                   required
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.confirmPassword}
                 />
                 <label htmlFor="confirmPassword">Confirm Password</label>
+                {formik.touched.confirmPassword &&
+                  formik.errors.confirmPassword && (
+                    <p className="text-danger">
+                      {formik.errors.confirmPassword}
+                    </p>
+                  )}
               </div>
-            </div>
+            </div> */}
           </div>
 
           <div className="row g-2">
@@ -126,8 +231,14 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
                   id="image"
                   placeholder=""
                   name="image"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.image}
                 />
                 <label htmlFor="image">Profile Image</label>
+                {formik.touched.image && formik.errors.image && (
+                  <p className="text-danger">{formik.errors.image}</p>
+                )}
               </div>
             </div>
 
@@ -139,8 +250,14 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
                   id="alt"
                   placeholder=""
                   name="alt"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.alt}
                 />
                 <label htmlFor="alt">Alternative Text</label>
+                {formik.touched.alt && formik.errors.alt && (
+                  <p className="text-danger">{formik.errors.alt}</p>
+                )}
               </div>
             </div>
           </div>
@@ -154,8 +271,14 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
                   id="state"
                   placeholder=""
                   name="state"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.state}
                 />
                 <label htmlFor="state">State</label>
+                {formik.touched.state && formik.errors.state && (
+                  <p className="text-danger">{formik.errors.state}</p>
+                )}
               </div>
             </div>
             <div className="col-md">
@@ -167,8 +290,14 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
                   placeholder=""
                   name="country"
                   required
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.country}
                 />
                 <label htmlFor="country">Country</label>
+                {formik.touched.country && formik.errors.country && (
+                  <p className="text-danger">{formik.errors.country}</p>
+                )}
               </div>
             </div>
             <div className="col-md">
@@ -180,8 +309,14 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
                   placeholder=""
                   name="city"
                   required
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.city}
                 />
                 <label htmlFor="city">City</label>
+                {formik.touched.city && formik.errors.city && (
+                  <p className="text-danger">{formik.errors.city}</p>
+                )}
               </div>
             </div>
           </div>
@@ -196,8 +331,14 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
                   placeholder=""
                   name="street"
                   required
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.street}
                 />
                 <label htmlFor="street">Street</label>
+                {formik.touched.street && formik.errors.street && (
+                  <p className="text-danger">{formik.errors.street}</p>
+                )}
               </div>
             </div>
             <div className="col-md-3">
@@ -209,8 +350,14 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
                   placeholder=""
                   name="houseNumber"
                   required
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.houseNumber}
                 />
                 <label htmlFor="houseNumber">House Number</label>
+                {formik.touched.houseNumber && formik.errors.houseNumber && (
+                  <p className="text-danger">{formik.errors.houseNumber}</p>
+                )}
               </div>
             </div>
             <div className="col-md-3">
@@ -222,8 +369,14 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
                   placeholder=""
                   name="zip"
                   required
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.zip}
                 />
                 <label htmlFor="zip">Zip Code</label>
+                {formik.touched.zip && formik.errors.zip && (
+                  <p className="text-danger">{formik.errors.zip}</p>
+                )}
               </div>
             </div>
           </div>
@@ -232,16 +385,25 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
             <input
               className="form-check-input"
               type="checkbox"
-              value=""
               id="isBusiness"
               name="isBusiness"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.isBusiness}
             />
             <label className="form-check-label" htmlFor="isBusiness">
               Is Business?
             </label>
+            {formik.touched.isBusiness && formik.errors.isBusiness && (
+              <p className="text-danger">{formik.errors.isBusiness}</p>
+            )}
           </div>
 
-          <button type="submit" className="btn btn-primary mt-4">
+          <button
+            disabled={!formik.isValid || !formik.dirty}
+            type="submit"
+            className="btn btn-primary mt-4"
+          >
             Register
           </button>
         </form>
