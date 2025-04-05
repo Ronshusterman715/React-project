@@ -18,7 +18,7 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({ loginEvent }) => {
       let auth = formatAuthForServer(values);
       authResponse = await login(auth);
       if (authResponse.status === 200) {
-        localStorage.setItem("token", JSON.stringify(authResponse.data));
+        localStorage.setItem("token", authResponse.data);
         successMessage("login successfully");
         navigate("/cards");
         loginEvent();

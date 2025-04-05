@@ -1,8 +1,12 @@
-import axios from "axios";
+import { Card } from "../interfaces/cards/Card";
+import axiosInstance from "../utils/interceptors/axios-interceptor";
 
-const API: string = import.meta.env.VITE_CARDS_API;
+
+export async function createCard(card: Card) {
+  return await axiosInstance.post("/cards", card);
+}
 
 //get all cards
-export function getAllCards() {
-  return axios.get(API);
+export async function getAllCards() {
+  return await axiosInstance.get("/cards");
 }

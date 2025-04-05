@@ -6,10 +6,12 @@ import Cards from "./components/Cards";
 import { ToastContainer } from "react-toastify";
 import { useEffect, useState } from "react";
 import { useJwtDecoder } from "./hooks/useJwtDecoder";
+import Navbar from "./components/Navbar";
+import Cardform from "./components/Cardform";
 
 function App() {
   const [jwtToken, setJwtToken] = useState<string | null>(
-    JSON.parse(localStorage.getItem("token") ?? "{}")
+    localStorage.getItem("token")
   );
 
   const { decodedToken, error } = useJwtDecoder(jwtToken);
@@ -17,13 +19,15 @@ function App() {
   useEffect(() => {}, [jwtToken]);
 
   const loginEvent = () => {
-    setJwtToken(JSON.parse(localStorage.getItem("token") ?? "{}"));
+    setJwtToken(localStorage.getItem("token"));
   };
 
   return (
-    <div className="container">
+    <>
       <ToastContainer />
+
       <Router>
+        <Navbar decodedToken={decodedToken} />
         <Routes>
           <Route path="/" element={<Cards decodedToken={decodedToken} />} />
           <Route
@@ -35,9 +39,10 @@ function App() {
             path="/login"
             element={<LoginForm loginEvent={loginEvent} />}
           />
+          <Route path="/cardform" element={<Cardform />} />
         </Routes>
       </Router>
-    </div>
+    </>
   );
 }
 

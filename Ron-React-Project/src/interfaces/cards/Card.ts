@@ -11,7 +11,7 @@ export interface Card {
   web: string;
   image: Image;
   address: Address;
-  bizNumber: number;
-  likes: string[];
-  user_id: string;
+  bizNumber?: number;
+  likes?: string[];
+  user_id?: string;
 }

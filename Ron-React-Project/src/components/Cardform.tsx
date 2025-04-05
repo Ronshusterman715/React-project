@@ -1,45 +1,45 @@
-import { FormikValues, useFormik } from "formik";
+import { FormikValues, useFormik, validateYupSchema } from "formik";
 import { FunctionComponent } from "react";
-import * as yup from "yup";
-import { formatUserForServer } from "../utils/users/formatUserForServer";
-import { createUser } from "../services/usersService";
-import { errorMessage, successMessage } from "../utils/ui/alert";
 import { useNavigate } from "react-router-dom";
+import * as yup from "yup";
+import { formatCardForServer } from "../utils/cards/formatCardForServer";
+import { createCard } from "../services/cardsService";
+import { errorMessage, successMessage } from "../utils/ui/alert";
 
-interface RegisterFormProps {}
+interface CardformProps {}
 
-const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
+const Cardform: FunctionComponent<CardformProps> = () => {
   const navigate = useNavigate();
   const handleSubmit = async (values: FormikValues) => {
-    let createUserResponse = null;
+    let createCardResponse = null;
     try {
-      let user = formatUserForServer(values);
-      createUserResponse = await createUser(user);
+      debugger
+      let card = formatCardForServer(values);
+      createCardResponse = await createCard(card);
 
-      if (createUserResponse.status === 201) {
-        successMessage("user created successfully");
-        navigate("/login");
+      if (createCardResponse.status === 201) {
+        successMessage("card created successfully");
+        navigate("/cards");
       } else {
-        errorMessage("failed to create user");
+        errorMessage("failed to create card");
       }
     } catch (err: any) {
       console.log(err);
       if (err.response.data)
-        errorMessage(`failed to create user - ${err.response.data}`);
+        errorMessage(`failed to create card - ${err.response.data}`);
       else {
-        errorMessage(`failed to create user`);
+        errorMessage(`failed to create card`);
       }
     }
   };
-
   const formik: FormikValues = useFormik<FormikValues>({
     initialValues: {
-      first: "",
-      middle: "",
-      last: "",
+      title: "",
+      subtitle: "",
+      description: "",
       phone: "",
       email: "",
-      password: "",
+      web: "",
       image: "",
       alt: "",
       state: "",
@@ -48,32 +48,29 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
       street: "",
       houseNumber: "",
       zip: "",
-      isBusiness: false,
     },
     validationSchema: yup.object({
-      first: yup.string().min(2).max(256).required(),
-      middle: yup.string().min(2).max(256),
-      last: yup.string().min(2).max(256).required(),
+      title: yup.string().min(2).max(256).required(),
+      subtitle: yup.string().min(2).max(256).required(),
+      description: yup.string().min(2).max(1024).required(),
       phone: yup.string().min(9).max(11).required(),
       email: yup.string().email().min(5).required(),
-      password: yup.string().min(7).max(20).required(),
-      image: yup.string().min(14),
-      alt: yup.string().min(2).max(256),
-      state: yup.string().min(2).max(256),
-      country: yup.string().min(2).max(256).required(),
-      city: yup.string().min(2).max(256).required(),
-      street: yup.string().min(2).max(256).required(),
-      houseNumber: yup.number().min(2).max(256).required(),
-      zip: yup.string().min(2).max(256).required(),
-      isBusiness: yup.boolean().required(),
+      web: yup.string().min(14),
+      image: yup.string().min(14).required(),
+      alt: yup.string().min(2).max(256).required(),
+      state: yup.string(),
+      country: yup.string().required(),
+      city: yup.string().required(),
+      street: yup.string().required(),
+      houseNumber: yup.number().min(1).required(),
+      zip: yup.string().required(),
     }),
     onSubmit: handleSubmit,
   });
-
   return (
     <>
       <div className="w-50 mx-auto py-3">
-        <h1 className="display-1 text-center mb-4">Register</h1>
+        <h1 className="display-1 text-center mb-4">Card Creation</h1>
         <form onSubmit={formik.handleSubmit}>
           <div className="row g-3">
             <div className="col-md">
@@ -81,17 +78,17 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
                 <input
                   type="text"
                   className="form-control"
-                  id="firstName"
-                  placeholder="Jhon"
-                  name="first"
+                  id="title"
+                  placeholder="Card Title"
+                  name="title"
                   required
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  value={formik.values.first}
+                  value={formik.values.title}
                 />
-                <label htmlFor="firstName">First Name</label>
-                {formik.touched.first && formik.errors.first && (
-                  <p className="text-danger">{formik.errors.first}</p>
+                <label htmlFor="title">title</label>
+                {formik.touched.title && formik.errors.title && (
+                  <p className="text-danger">{formik.errors.title}</p>
                 )}
               </div>
             </div>
@@ -100,16 +97,16 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
                 <input
                   type="text"
                   className="form-control"
-                  id="middleName"
-                  placeholder=""
-                  name="middle"
+                  id="subtitle"
+                  placeholder="Card Subtitle"
+                  name="subtitle"
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  value={formik.values.middle}
+                  value={formik.values.subtitle}
                 />
-                <label htmlFor="middleName">Middle Name</label>
-                {formik.touched.middle && formik.errors.middle && (
-                  <p className="text-danger">{formik.errors.middle}</p>
+                <label htmlFor="subtitle">subtitle</label>
+                {formik.touched.subtitle && formik.errors.subtitle && (
+                  <p className="text-danger">{formik.errors.subtitle}</p>
                 )}
               </div>
             </div>
@@ -118,17 +115,17 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
                 <input
                   type="text"
                   className="form-control"
-                  id="lastName"
-                  placeholder="Doe"
-                  name="last"
+                  id="description"
+                  placeholder="Card Description"
+                  name="description"
                   required
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  value={formik.values.last}
+                  value={formik.values.description}
                 />
-                <label htmlFor="lastName">Last Name</label>
-                {formik.touched.last && formik.errors.last && (
-                  <p className="text-danger">{formik.errors.last}</p>
+                <label htmlFor="description">description</label>
+                {formik.touched.description && formik.errors.description && (
+                  <p className="text-danger">{formik.errors.description}</p>
                 )}
               </div>
             </div>
@@ -154,7 +151,6 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
                 )}
               </div>
             </div>
-
             <div className="col-md">
               <div className="form-floating mb-3">
                 <input
@@ -180,80 +176,57 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
             <div className="col-md">
               <div className="form-floating mb-3">
                 <input
-                  type="password"
+                  type="url"
                   className="form-control"
-                  id="password"
-                  placeholder=""
-                  name="password"
-                  required
+                  id="web"
+                  placeholder="https://www.example.com"
+                  name="web"
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  value={formik.values.password}
+                  value={formik.values.web}
                 />
-                <label htmlFor="password">Password</label>
-                {formik.touched.password && formik.errors.password && (
-                  <p className="text-danger">{formik.errors.password}</p>
+                <label htmlFor="web">web</label>
+                {formik.touched.web && formik.errors.web && (
+                  <p className="text-danger">{formik.errors.web}</p>
                 )}
               </div>
             </div>
 
-            {/* <div className="col-md">
-              <div className="form-floating mb-3">
-                <input
-                  type="password"
-                  className="form-control"
-                  id="confirmPassword"
-                  placeholder=""
-                  name="confirmPassword"
-                  required
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  value={formik.values.confirmPassword}
-                />
-                <label htmlFor="confirmPassword">Confirm Password</label>
-                {formik.touched.confirmPassword &&
-                  formik.errors.confirmPassword && (
-                    <p className="text-danger">
-                      {formik.errors.confirmPassword}
-                    </p>
-                  )}
-              </div>
-            </div> */}
-          </div>
-
-          <div className="row g-2">
             <div className="col-md">
               <div className="form-floating mb-3">
                 <input
                   type="url"
                   className="form-control"
                   id="image"
-                  placeholder=""
+                  placeholder="https://www.example.com/image.jpg"
                   name="image"
+                  required
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   value={formik.values.image}
                 />
-                <label htmlFor="image">Profile Image</label>
+                <label htmlFor="image">Image url</label>
                 {formik.touched.image && formik.errors.image && (
                   <p className="text-danger">{formik.errors.image}</p>
                 )}
               </div>
             </div>
+          </div>
 
+          <div className="row g-2">
             <div className="col-md">
               <div className="form-floating mb-3">
                 <input
                   type="text"
                   className="form-control"
                   id="alt"
-                  placeholder=""
+                  placeholder="Alternative text"
                   name="alt"
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   value={formik.values.alt}
                 />
-                <label htmlFor="alt">Alternative Text</label>
+                <label htmlFor="alt">Alternative text</label>
                 {formik.touched.alt && formik.errors.alt && (
                   <p className="text-danger">{formik.errors.alt}</p>
                 )}
@@ -380,30 +353,12 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
             </div>
           </div>
 
-          <div className="form-check">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              id="isBusiness"
-              name="isBusiness"
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.isBusiness}
-            />
-            <label className="form-check-label" htmlFor="isBusiness">
-              Is Business?
-            </label>
-            {formik.touched.isBusiness && formik.errors.isBusiness && (
-              <p className="text-danger">{formik.errors.isBusiness}</p>
-            )}
-          </div>
-
           <button
             disabled={!formik.isValid || !formik.dirty}
             type="submit"
             className="btn btn-primary mt-4"
           >
-            Register
+            Create
           </button>
         </form>
       </div>
@@ -411,4 +366,4 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
   );
 };
 
-export default RegisterForm;
+export default Cardform;
