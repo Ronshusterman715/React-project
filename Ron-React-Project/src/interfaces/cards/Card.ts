@@ -1,5 +1,5 @@
-import { Address } from "./address";
-import { Image } from "./image";
+import { Address } from "./Address";
+import { Image } from "./Image";
 
 export interface Card {
   _id?: string;

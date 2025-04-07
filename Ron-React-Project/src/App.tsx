@@ -1,5 +1,10 @@
 import "./App.css";
-import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import {
+  Route,
+  BrowserRouter as Router,
+  Routes,
+  useNavigate,
+} from "react-router-dom";
 import LoginForm from "./components/LoginForm";
 import RegisterForm from "./components/RegisterForm";
 import Cards from "./components/Cards";
@@ -8,6 +13,8 @@ import { useEffect, useState } from "react";
 import { useJwtDecoder } from "./hooks/useJwtDecoder";
 import Navbar from "./components/Navbar";
 import Cardform from "./components/Cardform";
+import Businessinfo from "./components/Businessinfo";
+import Footer from "./components/Footer";
 
 function App() {
   const [jwtToken, setJwtToken] = useState<string | null>(
@@ -16,10 +23,18 @@ function App() {
 
   const { decodedToken, error } = useJwtDecoder(jwtToken);
 
-  useEffect(() => {}, [jwtToken]);
+  useEffect(() => {
+    debugger;
+  }, [jwtToken]);
 
   const loginEvent = () => {
     setJwtToken(localStorage.getItem("token"));
+  };
+
+  const logoutEvent = () => {
+    localStorage.removeItem("token");
+    setJwtToken(null);
+    window.location.href = "/login";
   };
 
   return (
@@ -27,7 +42,7 @@ function App() {
       <ToastContainer />
 
       <Router>
-        <Navbar decodedToken={decodedToken} />
+        <Navbar decodedToken={decodedToken} logoutEvent={logoutEvent} />
         <Routes>
           <Route path="/" element={<Cards decodedToken={decodedToken} />} />
           <Route
@@ -39,8 +54,17 @@ function App() {
             path="/login"
             element={<LoginForm loginEvent={loginEvent} />}
           />
-          <Route path="/cardform" element={<Cardform />} />
+          <Route
+            path="/cards/create"
+            element={<Cardform isCreateMode={true} />}
+          />
+          <Route
+            path="/cards/:id/edit"
+            element={<Cardform isCreateMode={false} />}
+          />
+          <Route path="/businessinfo/:id/" element={<Businessinfo />} />
         </Routes>
+        <Footer decodedToken={decodedToken} />
       </Router>
     </>
   );

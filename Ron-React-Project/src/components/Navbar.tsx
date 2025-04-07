@@ -3,9 +3,17 @@ import { NavLink } from "react-router-dom";
 
 interface NavbarProps {
   decodedToken: any;
+  logoutEvent: () => void;
 }
 
-const Navbar: FunctionComponent<NavbarProps> = ({ decodedToken }) => {
+const Navbar: FunctionComponent<NavbarProps> = ({
+  decodedToken,
+  logoutEvent,
+}) => {
+  const logout = () => {
+    logoutEvent();
+  };
+
   return (
     <>
       <nav
@@ -15,7 +23,7 @@ const Navbar: FunctionComponent<NavbarProps> = ({ decodedToken }) => {
         <div className="container">
           {/* Brand */}
           <NavLink className="navbar-brand" to="/">
-            BCard
+            Business Connect
           </NavLink>
 
           {/* Hamburger toggle (for mobile) */}
@@ -46,16 +54,29 @@ const Navbar: FunctionComponent<NavbarProps> = ({ decodedToken }) => {
                 </NavLink>
               </li>
               {decodedToken ? (
-                <li className="nav-item">
-                  <NavLink
-                    to="/favcards"
-                    className={({ isActive }) =>
-                      "nav-link" + (isActive ? " active" : "")
-                    }
-                  >
-                    Fav Cards
-                  </NavLink>
-                </li>
+                <>
+                  <li className="nav-item">
+                    <NavLink
+                      to="/favcards"
+                      className={({ isActive }) =>
+                        "nav-link" + (isActive ? " active" : "")
+                      }
+                    >
+                      Fav Cards
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      onClick={logout}
+                      to="/login"
+                      className={({ isActive }) =>
+                        "nav-link" + (isActive ? " active" : "")
+                      }
+                    >
+                      Logout
+                    </NavLink>
+                  </li>
+                </>
               ) : (
                 <>
                   <li className="nav-item">

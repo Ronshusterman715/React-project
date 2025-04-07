@@ -1,19 +1,61 @@
 import { FormikValues, useFormik, validateYupSchema } from "formik";
-import { FunctionComponent } from "react";
-import { useNavigate } from "react-router-dom";
+import { FunctionComponent, useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import * as yup from "yup";
 import { formatCardForServer } from "../utils/cards/formatCardForServer";
-import { createCard } from "../services/cardsService";
+import { createCard, getCardById, updateCard } from "../services/cardsService";
 import { errorMessage, successMessage } from "../utils/ui/alert";
+import { Card } from "../interfaces/cards/Card";
 
-interface CardformProps {}
+interface CardformProps {
+  isCreateMode: boolean;
+}
 
-const Cardform: FunctionComponent<CardformProps> = () => {
+const Cardform: FunctionComponent<CardformProps> = ({ isCreateMode }) => {
   const navigate = useNavigate();
-  const handleSubmit = async (values: FormikValues) => {
+  const location = useLocation();
+  const { id } = useParams();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (id && location.state) {
+      updateFormikValues(location.state);
+    } else if (id) {
+      getCardById(id)
+        .then((res) => {
+          updateFormikValues(res.data);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    } else if (!isCreateMode) {
+      navigate("/cards");
+    }
+    setIsLoading(false);
+  }, [id]);
+
+  const updateFormikValues = (card: Card) => {
+    formik.setValues({
+      title: card.title,
+      subtitle: card.subtitle,
+      description: card.description,
+      phone: card.phone,
+      email: card.email,
+      web: card.web,
+      image: card.image.url,
+      alt: card.image.alt,
+      state: card.address.state,
+      country: card.address.country,
+      city: card.address.city,
+      street: card.address.street,
+      houseNumber: card.address.houseNumber,
+      zip: card.address.zip,
+    });
+  };
+  const handleCreateSubmit = async (values: FormikValues) => {
+    debugger
     let createCardResponse = null;
     try {
-      debugger
       let card = formatCardForServer(values);
       createCardResponse = await createCard(card);
 
@@ -29,6 +71,27 @@ const Cardform: FunctionComponent<CardformProps> = () => {
         errorMessage(`failed to create card - ${err.response.data}`);
       else {
         errorMessage(`failed to create card`);
+      }
+    }
+  };
+  const handleEditSubmit = async (values: FormikValues) => {
+    debugger
+    let editCardResponse = null;
+    try {
+      let card = formatCardForServer(values);
+      editCardResponse = await updateCard(id!, card);
+
+      if (editCardResponse.status === 200) {
+        successMessage("card updated successfully");
+      } else {
+        errorMessage("failed to update card");
+      }
+    } catch (err: any) {
+      console.log(err);
+      if (err.response.data)
+        errorMessage(`failed to update card - ${err.response.data}`);
+      else {
+        errorMessage(`failed to update card`);
       }
     }
   };
@@ -65,12 +128,25 @@ const Cardform: FunctionComponent<CardformProps> = () => {
       houseNumber: yup.number().min(1).required(),
       zip: yup.string().required(),
     }),
-    onSubmit: handleSubmit,
+    onSubmit: isCreateMode ? handleCreateSubmit : handleEditSubmit,
   });
+
+  if (isLoading) {
+    return (
+      <div className="d-flex justify-content-center my-5">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="w-50 mx-auto py-3">
-        <h1 className="display-1 text-center mb-4">Card Creation</h1>
+        <h1 className="display-1 text-center mb-4">
+          {isCreateMode == true ? "Card Creation" : "Card Edit"}
+        </h1>
         <form onSubmit={formik.handleSubmit}>
           <div className="row g-3">
             <div className="col-md">
@@ -353,13 +429,23 @@ const Cardform: FunctionComponent<CardformProps> = () => {
             </div>
           </div>
 
-          <button
-            disabled={!formik.isValid || !formik.dirty}
-            type="submit"
-            className="btn btn-primary mt-4"
-          >
-            Create
-          </button>
+          {isCreateMode ? (
+            <button
+              disabled={!formik.isValid || !formik.dirty}
+              type="submit"
+              className="btn btn-primary mt-4"
+            >
+              Create
+            </button>
+          ) : (
+            <button
+              disabled={!formik.isValid || !formik.dirty}
+              type="submit"
+              className="btn btn-primary mt-4"
+            >
+              Edit
+            </button>
+          )}
         </form>
       </div>
     </>

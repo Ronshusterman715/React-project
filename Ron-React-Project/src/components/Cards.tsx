@@ -12,11 +12,16 @@ const Cards: FunctionComponent<CardsProps> = ({ decodedToken }) => {
   useEffect(() => {
     getAllCards()
       .then((res) => {
+        debugger
         setCards(res.data);
         setIsCardLoading(false);
       })
       .catch((err) => console.log(err));
   }, []);
+
+  const onDeleteCard = (cardId: string) => {
+    setCards(cards.filter((card) => card._id !== cardId))
+  }
   return (
     <>
       {isCardLoading ? (
@@ -30,7 +35,12 @@ const Cards: FunctionComponent<CardsProps> = ({ decodedToken }) => {
           <div className="row d-flex justify-content-center">
             <h3>{decodedToken?._id}</h3>
             {cards.map((card: Card) => (
-              <BusinessCard key={card._id} card={card} />
+              <BusinessCard
+                onDeleteCard={onDeleteCard}
+                decodedToken={decodedToken}
+                key={card._id}
+                card={card}
+              />
             ))}
           </div>
         </div>
