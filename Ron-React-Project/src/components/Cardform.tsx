@@ -1,4 +1,4 @@
-import { FormikValues, useFormik, validateYupSchema } from "formik";
+import { FormikValues, useFormik } from "formik";
 import { FunctionComponent, useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import * as yup from "yup";
@@ -53,7 +53,6 @@ const Cardform: FunctionComponent<CardformProps> = ({ isCreateMode }) => {
     });
   };
   const handleCreateSubmit = async (values: FormikValues) => {
-    debugger
     let createCardResponse = null;
     try {
       let card = formatCardForServer(values);
@@ -75,7 +74,6 @@ const Cardform: FunctionComponent<CardformProps> = ({ isCreateMode }) => {
     }
   };
   const handleEditSubmit = async (values: FormikValues) => {
-    debugger
     let editCardResponse = null;
     try {
       let card = formatCardForServer(values);

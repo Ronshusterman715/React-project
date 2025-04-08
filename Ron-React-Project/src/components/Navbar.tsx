@@ -1,5 +1,6 @@
-import { FunctionComponent } from "react";
-import { NavLink } from "react-router-dom";
+import { FunctionComponent, useContext, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { ThemeContext } from "../context/ThemeContext";
 
 interface NavbarProps {
   decodedToken: any;
@@ -10,8 +11,20 @@ const Navbar: FunctionComponent<NavbarProps> = ({
   decodedToken,
   logoutEvent,
 }) => {
+  const [searchText, setSearchText] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error("Navbar must be used within a ThemeProvider");
+  }
+
   const logout = () => {
     logoutEvent();
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(e.target.value);
+    navigate(`/cards/?search=${e.target.value}`);
   };
 
   return (
@@ -65,6 +78,16 @@ const Navbar: FunctionComponent<NavbarProps> = ({
                       Fav Cards
                     </NavLink>
                   </li>
+                  <li className="nav-item">
+                    <NavLink
+                      to={`/users/${decodedToken._id}/edit`}
+                      className={({ isActive }) =>
+                        "nav-link" + (isActive ? " active" : "")
+                      }
+                    >
+                      Account Details
+                    </NavLink>
+                  </li>
                   <li>
                     <NavLink
                       onClick={logout}
@@ -104,17 +127,29 @@ const Navbar: FunctionComponent<NavbarProps> = ({
             </ul>
 
             {/* Search Form */}
-            <form className="d-flex me-3">
-              <input
-                className="form-control me-2"
-                type="search"
-                placeholder="Search"
-                aria-label="Search"
-              />
-              <button className="btn btn-outline-light" type="submit">
-                <i className="fas fa-search"></i>
+
+            <input
+              className="form-control me-2"
+              type="search"
+              placeholder="Search"
+              aria-label="Search"
+              onChange={handleSearchChange}
+            />
+            {context.theme === "dark" ? (
+              <button
+                className="btn btn-outline-light"
+                onClick={context.toggleTheme}
+              >
+                <i className="fas fa-sun"></i>
               </button>
-            </form>
+            ) : (
+              <button
+                className="btn btn-outline-dark"
+                onClick={context.toggleTheme}
+              >
+                <i className="fas fa-moon"></i>
+              </button>
+            )}
 
             {/* User Avatar */}
             <div>

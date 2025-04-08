@@ -1,2 +1,43 @@
 @import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
 @import "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css";
+
+.light {
+  background-color: #ffffff;
+  color: #333333;
+}
+
+.light button {
+  background-color: #007bff;
+  color: white;
+}
+
+.light button:hover {
+  background-color: #0056b3;
+}
+
+/* Dark Mode Styles */
+.dark {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+.dark button {
+  background-color: #444;
+  color: #fff;
+}
+
+.dark button:hover {
+  background-color: #555;
+}
+
+.dark label {
+  color: #000 !important; /* Make all labels black in dark mode */
+}
+
+.light .form-check-label {
+  color: #000 !important; /* Make all labels black in dark mode */
+}
+
+.dark .form-check-label {
+  color: #fff !important; /* Make all labels black in dark mode */
+}

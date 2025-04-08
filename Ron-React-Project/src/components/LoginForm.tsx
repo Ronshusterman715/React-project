@@ -103,9 +103,6 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({ loginEvent }) => {
               onBlur={formik.handleBlur}
               value={formik.values.rememberMe}
             />
-            <label className="form-check-label" htmlFor="rememberMe">
-              Remember Me
-            </label>
           </div>
 
           <button

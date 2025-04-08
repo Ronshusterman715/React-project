@@ -2,26 +2,49 @@ import { FunctionComponent, useEffect, useState } from "react";
 import { getAllCards } from "../services/cardsService";
 import BusinessCard from "./cards/BusinessCard";
 import { Card } from "../interfaces/cards/Card";
+import { useLocation } from "react-router-dom";
 interface CardsProps {
   decodedToken: any;
 }
 
 const Cards: FunctionComponent<CardsProps> = ({ decodedToken }) => {
   const [cards, setCards] = useState<Card[]>([]);
+  const [filteredCards, setFilteredCards] = useState<Card[]>(cards);
   const [isCardLoading, setIsCardLoading] = useState<boolean>(true);
+  const location = useLocation();
+  const searchQuery = new URLSearchParams(location.search).get("search") || "";
+
   useEffect(() => {
-    getAllCards()
-      .then((res) => {
-        debugger
-        setCards(res.data);
-        setIsCardLoading(false);
-      })
-      .catch((err) => console.log(err));
-  }, []);
+    if (cards.length === 0) {
+      getAllCards()
+        .then((res) => {
+          if (searchQuery) {
+            const filteredCards = res.data.filter((card: Card) =>
+              card.title.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+            setCards(res.data);
+            setFilteredCards(filteredCards);
+          } else {
+            setCards(res.data);
+            setFilteredCards(res.data);
+          }
+        })
+        .catch((err) => console.log(err));
+    } else if (searchQuery) {
+      const filteredCards = cards.filter((card: Card) =>
+        card.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredCards(filteredCards);
+    } else {
+      setFilteredCards(cards);
+    }
+    setIsCardLoading(false);
+  }, [searchQuery]);
 
   const onDeleteCard = (cardId: string) => {
-    setCards(cards.filter((card) => card._id !== cardId))
-  }
+    setCards(cards.filter((card) => card._id !== cardId));
+    setFilteredCards(filteredCards.filter((card) => card._id !== cardId));
+  };
   return (
     <>
       {isCardLoading ? (
@@ -34,7 +57,7 @@ const Cards: FunctionComponent<CardsProps> = ({ decodedToken }) => {
         <div className="container">
           <div className="row d-flex justify-content-center">
             <h3>{decodedToken?._id}</h3>
-            {cards.map((card: Card) => (
+            {filteredCards.map((card: Card) => (
               <BusinessCard
                 onDeleteCard={onDeleteCard}
                 decodedToken={decodedToken}

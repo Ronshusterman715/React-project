@@ -24,7 +24,6 @@ const BusinessCard: FunctionComponent<BusinessCardProps> = ({
   const handleCardDeleteClick = async () => {
     let deleteCardResponse = null;
     try {
-      debugger;
       deleteCardResponse = await deleteCard(card._id!);
       if (deleteCardResponse.status === 200) {
         onDeleteCard(card._id!);

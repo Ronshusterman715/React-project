@@ -1,16 +1,60 @@
 import { FormikValues, useFormik } from "formik";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 import * as yup from "yup";
 import { formatUserForServer } from "../utils/users/formatUserForServer";
-import { createUser } from "../services/usersService";
+import { createUser, editUser, getUserById } from "../services/usersService";
 import { errorMessage, successMessage } from "../utils/ui/alert";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { User } from "../interfaces/users/User";
 
-interface RegisterFormProps {}
+interface RegisterFormProps {
+  isCreateMode: boolean;
+}
 
-const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
+const RegisterForm: FunctionComponent<RegisterFormProps> = ({
+  isCreateMode,
+}) => {
+  const { id } = useParams();
   const navigate = useNavigate();
-  const handleSubmit = async (values: FormikValues) => {
+  const location = useLocation();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (id) {
+      getUserById(id)
+        .then((res) => {
+          updateFormikValues(res.data);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    } else if (!isCreateMode) {
+      navigate("/cards");
+    }
+    setIsLoading(false);
+  }, [id]);
+
+  const updateFormikValues = (user: User) => {
+    formik.setValues({
+      first: user.name.first,
+      middle: user.name.middle,
+      last: user.name.last,
+      phone: user.phone,
+      email: user.email,
+      password: user.password,
+      image: user.image.url,
+      alt: user.image.alt,
+      state: user.address.state,
+      country: user.address.country,
+      city: user.address.city,
+      street: user.address.street,
+      houseNumber: user.address.houseNumber,
+      zip: user.address.zip,
+      isBusiness: user.isBusiness,
+    });
+  };
+
+  const handleCreateSubmit = async (values: FormikValues) => {
     let createUserResponse = null;
     try {
       let user = formatUserForServer(values);
@@ -28,6 +72,28 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
         errorMessage(`failed to create user - ${err.response.data}`);
       else {
         errorMessage(`failed to create user`);
+      }
+    }
+  };
+
+  const handleEditSubmit = async (values: FormikValues) => {
+    debugger;
+    let editUserResponse = null;
+    try {
+      let user = formatUserForServer(values, false);
+      editUserResponse = await editUser(id!, user);
+
+      if (editUserResponse.status === 200) {
+        successMessage("user updated successfully");
+      } else {
+        errorMessage("failed to updated user");
+      }
+    } catch (err: any) {
+      console.log(err);
+      if (err.response.data)
+        errorMessage(`failed to updated user - ${err.response.data}`);
+      else {
+        errorMessage(`failed to updated user`);
       }
     }
   };
@@ -56,7 +122,9 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
       last: yup.string().min(2).max(256).required(),
       phone: yup.string().min(9).max(11).required(),
       email: yup.string().email().min(5).required(),
-      password: yup.string().min(7).max(20).required(),
+      password: isCreateMode
+        ? yup.string().min(7).max(20).required()
+        : yup.string().min(7).max(20),
       image: yup.string().min(14),
       alt: yup.string().min(2).max(256),
       state: yup.string().min(2).max(256),
@@ -67,13 +135,25 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
       zip: yup.string().min(2).max(256).required(),
       isBusiness: yup.boolean().required(),
     }),
-    onSubmit: handleSubmit,
+    onSubmit: isCreateMode ? handleCreateSubmit : handleEditSubmit,
   });
+
+  if (isLoading) {
+    return (
+      <div className="d-flex justify-content-center my-5">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
       <div className="w-50 mx-auto py-3">
-        <h1 className="display-1 text-center mb-4">Register</h1>
+        <h1 className="display-1 text-center mb-4">
+          {isCreateMode == true ? "Register" : "Edit"}
+        </h1>
         <form onSubmit={formik.handleSubmit}>
           <div className="row g-3">
             <div className="col-md">
@@ -164,6 +244,7 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
                   placeholder="jhon@doe.com"
                   name="email"
                   required
+                  disabled={!isCreateMode}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   value={formik.values.email}
@@ -175,51 +256,31 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
               </div>
             </div>
           </div>
-
-          <div className="row g-2">
-            <div className="col-md">
-              <div className="form-floating mb-3">
-                <input
-                  type="password"
-                  className="form-control"
-                  id="password"
-                  placeholder=""
-                  name="password"
-                  required
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  value={formik.values.password}
-                />
-                <label htmlFor="password">Password</label>
-                {formik.touched.password && formik.errors.password && (
-                  <p className="text-danger">{formik.errors.password}</p>
-                )}
+          {isCreateMode && (
+            <>
+              <div className="row g-2">
+                <div className="col-md">
+                  <div className="form-floating mb-3">
+                    <input
+                      type="password"
+                      className="form-control"
+                      id="password"
+                      placeholder=""
+                      name="password"
+                      required
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      value={formik.values.password}
+                    />
+                    <label htmlFor="password">Password</label>
+                    {formik.touched.password && formik.errors.password && (
+                      <p className="text-danger">{formik.errors.password}</p>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-
-            {/* <div className="col-md">
-              <div className="form-floating mb-3">
-                <input
-                  type="password"
-                  className="form-control"
-                  id="confirmPassword"
-                  placeholder=""
-                  name="confirmPassword"
-                  required
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  value={formik.values.confirmPassword}
-                />
-                <label htmlFor="confirmPassword">Confirm Password</label>
-                {formik.touched.confirmPassword &&
-                  formik.errors.confirmPassword && (
-                    <p className="text-danger">
-                      {formik.errors.confirmPassword}
-                    </p>
-                  )}
-              </div>
-            </div> */}
-          </div>
+            </>
+          )}
 
           <div className="row g-2">
             <div className="col-md">
@@ -380,31 +441,45 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = () => {
             </div>
           </div>
 
-          <div className="form-check">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              id="isBusiness"
-              name="isBusiness"
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.isBusiness}
-            />
-            <label className="form-check-label" htmlFor="isBusiness">
-              Is Business?
-            </label>
-            {formik.touched.isBusiness && formik.errors.isBusiness && (
-              <p className="text-danger">{formik.errors.isBusiness}</p>
-            )}
-          </div>
+          {isCreateMode && (
+            <>
+              <div className="form-check">
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  id="isBusiness"
+                  name="isBusiness"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.isBusiness}
+                />
+                <label className="form-check-label" htmlFor="isBusiness">
+                  Is Business?
+                </label>
+                {formik.touched.isBusiness && formik.errors.isBusiness && (
+                  <p className="text-danger">{formik.errors.isBusiness}</p>
+                )}
+              </div>
+            </>
+          )}
 
-          <button
-            disabled={!formik.isValid || !formik.dirty}
-            type="submit"
-            className="btn btn-primary mt-4"
-          >
-            Register
-          </button>
+          {isCreateMode ? (
+            <button
+              disabled={!formik.isValid || !formik.dirty}
+              type="submit"
+              className="btn btn-primary mt-4"
+            >
+              Register
+            </button>
+          ) : (
+            <button
+              disabled={!formik.isValid || !formik.dirty}
+              type="submit"
+              className="btn btn-primary mt-4"
+            >
+              Edit
+            </button>
+          )}
         </form>
       </div>
     </>
