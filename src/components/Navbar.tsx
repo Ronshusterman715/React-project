@@ -3,14 +3,13 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { ThemeContext } from "../context/ThemeContext";
 
 interface NavbarProps {
-  decodedToken: any;
   logoutEvent: () => void;
 }
 
 const Navbar: FunctionComponent<NavbarProps> = ({
-  decodedToken,
   logoutEvent,
 }) => {
+  const user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")!) : null;
   const [searchText, setSearchText] = useState<string | null>(null);
   const navigate = useNavigate();
   const context = useContext(ThemeContext);
@@ -30,10 +29,16 @@ const Navbar: FunctionComponent<NavbarProps> = ({
   return (
     <>
       <nav
-        className="navbar navbar-expand-lg navbar-dark w-100 px-3"
-        style={{ backgroundColor: "#1976d2" }}
+        className={`navbar navbar-expand-lg ${
+          context.theme === "dark" ? "navbar-dark" : "navbar-light"
+        }`}
+        style={{
+          backgroundColor: context.theme === "dark" ? "#333333" : "#1976d2",
+          color: "white",
+          padding: "0.5rem 1rem",
+        }}
       >
-        <div className="container">
+        <div className="container-fluid">
           {/* Brand */}
           <NavLink className="navbar-brand" to="/">
             Business Connect
@@ -55,7 +60,7 @@ const Navbar: FunctionComponent<NavbarProps> = ({
           {/* Collapsible Content */}
           <div className="collapse navbar-collapse" id="navbarContent">
             {/* Left Links */}
-            <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+            <ul className="navbar-nav me-auto">
               <li className="nav-item">
                 <NavLink
                   to="/about"
@@ -66,7 +71,7 @@ const Navbar: FunctionComponent<NavbarProps> = ({
                   ABOUT
                 </NavLink>
               </li>
-              {decodedToken ? (
+              {user ? (
                 <>
                   <li className="nav-item">
                     <NavLink
@@ -80,7 +85,7 @@ const Navbar: FunctionComponent<NavbarProps> = ({
                   </li>
                   <li className="nav-item">
                     <NavLink
-                      to={`/users/${decodedToken._id}/edit`}
+                      to={`/users/${user._id}/edit`}
                       className={({ isActive }) =>
                         "nav-link" + (isActive ? " active" : "")
                       }
@@ -88,17 +93,30 @@ const Navbar: FunctionComponent<NavbarProps> = ({
                       Account Details
                     </NavLink>
                   </li>
-                  <li>
-                    <NavLink
-                      onClick={logout}
-                      to="/login"
-                      className={({ isActive }) =>
-                        "nav-link" + (isActive ? " active" : "")
-                      }
-                    >
-                      Logout
-                    </NavLink>
-                  </li>
+                  {user && user.isBusiness && (
+                    <>
+                      <li className="nav-item">
+                        <NavLink
+                          to="/cards/create"
+                          className={({ isActive }) =>
+                            "nav-link" + (isActive ? " active" : "")
+                          }
+                        >
+                          Create Card
+                        </NavLink>
+                      </li>
+                      <li className="nav-item">
+                        <NavLink
+                          to="mycards"
+                          className={({ isActive }) =>
+                            "nav-link" + (isActive ? " active" : "")
+                          }
+                        >
+                          My Cards
+                        </NavLink>
+                      </li>
+                    </>
+                  )}
                 </>
               ) : (
                 <>
@@ -128,37 +146,57 @@ const Navbar: FunctionComponent<NavbarProps> = ({
 
             {/* Search Form */}
 
-            <input
-              className="form-control me-2"
-              type="search"
-              placeholder="Search"
-              aria-label="Search"
-              onChange={handleSearchChange}
-            />
-            {context.theme === "dark" ? (
-              <button
-                className="btn btn-outline-light"
-                onClick={context.toggleTheme}
-              >
-                <i className="fas fa-sun"></i>
-              </button>
-            ) : (
-              <button
-                className="btn btn-outline-dark"
-                onClick={context.toggleTheme}
-              >
-                <i className="fas fa-moon"></i>
-              </button>
-            )}
+            <div className="d-flex me-2">
+              <div className="input-group" style={{ width: "180px" }}>
+                <input
+                  className="form-control form-control-sm"
+                  type="search"
+                  placeholder="Search..."
+                  aria-label="Search"
+                  onChange={handleSearchChange}
+                />
+              </div>
+            </div>
+            <button
+              className={`btn ${
+                context.theme === "dark" ? "btn-light" : "btn-outline-light"
+              } me-2`}
+              onClick={context.toggleTheme}
+              title={`Switch to ${
+                context.theme === "dark" ? "light" : "dark"
+              } mode`}
+            >
+              <i
+                className={`fas fa-${
+                  context.theme === "dark" ? "sun" : "moon"
+                }`}
+              ></i>
+            </button>
 
             {/* User Avatar */}
-            <div>
-              <img
-                src="../../public/images/profile-image.png"
-                alt="User Avatar"
-                style={{ width: "40px", height: "40px", borderRadius: "50%" }}
-              />
-            </div>
+            {user && (
+              <div className="d-flex align-items-center">
+                <div className="me-2">
+                  <img
+                    src="/images/profile-image.png"
+                    alt="User Avatar"
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      borderRadius: "50%",
+                    }}
+                  />
+                </div>
+                <NavLink
+                  className="btn btn-outline-danger btn-sm"
+                  onClick={logout}
+                  title="Logout"
+                  to="/login"
+                >
+                  <i className="fas fa-sign-out-alt"></i>
+                </NavLink>
+              </div>
+            )}
           </div>
         </div>
       </nav>

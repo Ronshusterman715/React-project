@@ -21,6 +21,39 @@
   color: #ffffff;
 }
 
+.dark .card {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+  border: 1px solid rgba(255, 255, 255, 0.125) !important;
+}
+
+.dark .card-title,
+.dark .card-subtitle,
+.dark .card-body {
+  color: #e0e0e0 !important;
+}
+
+.dark .list-group-item {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+  border-color: rgba(255, 255, 255, 0.125) !important;
+}
+
+.dark .card-footer {
+  background-color: #252525 !important;
+  border-color: rgba(255, 255, 255, 0.125) !important;
+}
+
+.dark .form-control {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+  border: 1px solid #444 !important;
+}
+
+.dark .form-control::placeholder {
+  color: #aaa !important;
+}
+
 .dark button {
   background-color: #444;
   color: #fff;
@@ -31,15 +64,19 @@
 }
 
 .dark label {
-  color: #000 !important; /* Make all labels black in dark mode */
+  color: #000 !important;
 }
 
 .light .form-check-label {
-  color: #000 !important; /* Make all labels black in dark mode */
+  color: #000 !important;
 }
 
 .dark .form-check-label {
-  color: #fff !important; /* Make all labels black in dark mode */
+  color: #fff !important;
+}
+
+.dark .form-floating > label {
+  color: #aaa !important;
 }
 
 .business-card {
@@ -63,9 +100,11 @@
   max-width: 200px;
 }
 
-/* For responsive layout */
-@media (max-width: 768px) {
-  .business-card {
-    width: 100% !important;
-  }
+.navbar .nav-item {
+  padding: 0;
+  margin: 0 4px;
+}
+
+.navbar .nav-link {
+  padding: 0.25rem 0.5rem;
 }

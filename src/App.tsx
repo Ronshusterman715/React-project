@@ -16,18 +16,17 @@ import Cardform from "./components/Cardform";
 import Businessinfo from "./components/Businessinfo";
 import Footer from "./components/Footer";
 import { ThemeProvider } from "./context/ThemeContext";
+import Mycards from "./components/Mycards";
+import Favoritecards from "./components/Favoritecards";
 
 function App() {
   const [jwtToken, setJwtToken] = useState<string | null>(
     localStorage.getItem("token")
   );
 
- 
+  // const { decodedToken, error } = useJwtDecoder(jwtToken);
 
-  const { decodedToken, error } = useJwtDecoder(jwtToken);
-
-  useEffect(() => {
-  }, [jwtToken]);
+  useEffect(() => {}, [jwtToken]);
 
   const loginEvent = () => {
     setJwtToken(localStorage.getItem("token"));
@@ -35,6 +34,7 @@ function App() {
 
   const logoutEvent = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setJwtToken(null);
     window.location.href = "/login";
   };
@@ -45,14 +45,14 @@ function App() {
 
       <Router>
         <ThemeProvider>
-          <Navbar decodedToken={decodedToken} logoutEvent={logoutEvent} />
+          <Navbar logoutEvent={logoutEvent} />
           <Routes>
-            <Route path="/" element={<Cards decodedToken={decodedToken} />} />
+            <Route path="/" element={<Cards />} />
+            <Route path="/cards" element={<Cards />} />
             <Route
-              path="/cards"
-              element={<Cards decodedToken={decodedToken} />}
+              path="/register"
+              element={<RegisterForm isCreateMode={true} />}
             />
-            <Route path="/register" element={<RegisterForm isCreateMode={true}/>} />
             <Route
               path="/users/:id/edit"
               element={<RegisterForm isCreateMode={false} />}
@@ -70,8 +70,10 @@ function App() {
               element={<Cardform isCreateMode={false} />}
             />
             <Route path="/businessinfo/:id/" element={<Businessinfo />} />
+            <Route path="/mycards" element={<Mycards />} />
+            <Route path="/favcards" element={<Favoritecards />} />
           </Routes>
-          <Footer decodedToken={decodedToken} />
+          <Footer />
         </ThemeProvider>
       </Router>
     </>

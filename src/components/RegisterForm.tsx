@@ -77,7 +77,6 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = ({
   };
 
   const handleEditSubmit = async (values: FormikValues) => {
-    debugger;
     let editUserResponse = null;
     try {
       let user = formatUserForServer(values, false);
@@ -123,7 +122,15 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = ({
       phone: yup.string().min(9).max(11).required(),
       email: yup.string().email().min(5).required(),
       password: isCreateMode
-        ? yup.string().min(7).max(20).required()
+        ? yup
+            .string()
+            .min(7)
+            .max(20)
+            .matches(
+              /^(?=.*[A-Z])(?=.*[a-z])(?=(?:.*\d){4,})(?=.*[)!@%$#^&*\-_()]).+$/,
+              "Password must contain at least one uppercase letter, one lowercase letter, four digits and one special character )!@%$#^&*-_()"
+            )
+            .required()
         : yup.string().min(7).max(20),
       image: yup.string().min(14),
       alt: yup.string().min(2).max(256),

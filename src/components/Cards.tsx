@@ -4,10 +4,10 @@ import BusinessCard from "./cards/BusinessCard";
 import { Card } from "../interfaces/cards/Card";
 import { useLocation } from "react-router-dom";
 interface CardsProps {
-  decodedToken: any;
 }
 
-const Cards: FunctionComponent<CardsProps> = ({ decodedToken }) => {
+const Cards: FunctionComponent<CardsProps> = () => {
+  const user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")!) : null;
   const [cards, setCards] = useState<Card[]>([]);
   const [filteredCards, setFilteredCards] = useState<Card[]>(cards);
   const [isCardLoading, setIsCardLoading] = useState<boolean>(true);
@@ -56,11 +56,10 @@ const Cards: FunctionComponent<CardsProps> = ({ decodedToken }) => {
       ) : (
         <div className="container">
           <div className="row d-flex justify-content-center">
-            <h3>{decodedToken?._id}</h3>
             {filteredCards.map((card: Card) => (
               <BusinessCard
                 onDeleteCard={onDeleteCard}
-                decodedToken={decodedToken}
+                decodedToken={user}
                 key={card._id}
                 card={card}
               />

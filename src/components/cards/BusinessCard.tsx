@@ -1,7 +1,7 @@
-import { FunctionComponent } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 import { Card } from "../../interfaces/cards/Card";
-import { useNavigate } from "react-router-dom";
-import { deleteCard } from "../../services/cardsService";
+import { useLocation, useNavigate } from "react-router-dom";
+import { deleteCard, likeUnlikeCard } from "../../services/cardsService";
 import { errorMessage, successMessage } from "../../utils/ui/alert";
 
 interface BusinessCardProps {
@@ -15,8 +15,13 @@ const BusinessCard: FunctionComponent<BusinessCardProps> = ({
   decodedToken,
   onDeleteCard,
 }) => {
+  const location = useLocation();
   const navigate = useNavigate();
+  const [isUserLiked, setIsUserLiked] = useState<boolean>(
+    (decodedToken && card.likes?.includes(decodedToken._id)) || false
+  );
 
+  useEffect(() => {}, [isUserLiked]);
   const handleCardClick = () => {
     navigate(`/businessinfo/${card._id}`, { state: card });
   };
@@ -39,11 +44,35 @@ const BusinessCard: FunctionComponent<BusinessCardProps> = ({
         errorMessage(`failed to delete card`);
       }
     }
-    navigate("/cards");
+    // navigate("/cards");
   };
 
   const handleCardEditClick = () => {
     navigate(`/cards/${card._id}/edit`, { state: card });
+  };
+
+  const handleCardLikeUnlikeClick = async () => {
+    let patchCardResponse = null;
+    try {
+      patchCardResponse = await likeUnlikeCard(card._id!);
+      if (patchCardResponse.status === 200) {
+        setIsUserLiked((prev) => {
+          if (prev && location.pathname === "/favcards") {
+            onDeleteCard(card._id!);
+          }
+          return !prev;
+        });
+      } else {
+        errorMessage("failed to like/unlike card");
+      }
+    } catch (err: any) {
+      console.log(err);
+      if (err.response.data)
+        errorMessage(`failed to like/unlike card - ${err.response.data}`);
+      else {
+        errorMessage(`failed to like/unlike card`);
+      }
+    }
   };
 
   return (
@@ -109,9 +138,30 @@ const BusinessCard: FunctionComponent<BusinessCardProps> = ({
         >
           <i className="fa-solid fa-phone"></i>
         </a>
+
+        {isUserLiked && decodedToken && (
+          <a
+            onClick={handleCardLikeUnlikeClick}
+            className="btn btn-sm btn-outline-danger"
+            title="Unlike Card"
+            style={{ cursor: "pointer" }}
+          >
+            <i className="fa-solid fa-heart"></i>
+          </a>
+        )}
+        {!isUserLiked && decodedToken && (
+          <a
+            onClick={handleCardLikeUnlikeClick}
+            className="btn btn-sm btn-outline-secondary"
+            title="Like Card"
+            style={{ cursor: "pointer" }}
+          >
+            <i className="fa-regular fa-heart"></i>
+          </a>
+        )}
         {decodedToken &&
-          decodedToken.isBusiness &&
-          decodedToken._id === card.user_id && (
+          ((decodedToken.isBusiness && decodedToken._id === card.user_id) ||
+            decodedToken.isAdmin) && (
             <>
               <a
                 onClick={handleCardEditClick}

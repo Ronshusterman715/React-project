@@ -1,10 +1,12 @@
 import { FunctionComponent } from "react";
 
 interface FooterProps {
-  decodedToken: any;
 }
 
-const Footer: FunctionComponent<FooterProps> = ({ decodedToken }) => {
+const Footer: FunctionComponent<FooterProps> = () => {
+  const user = localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user")!)
+    : null;
   return (
     <>
       <footer className="bg-dark text-light py-4 mt-5">
@@ -30,7 +32,7 @@ const Footer: FunctionComponent<FooterProps> = ({ decodedToken }) => {
                     About
                   </a>
                 </li>
-                {decodedToken && decodedToken.isBusiness && (
+                {user && user.isBusiness && (
                   <li>
                     <a href="/favcards" className="text-light">
                       Fav Cards

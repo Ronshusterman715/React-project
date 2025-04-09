@@ -39,7 +39,6 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({ loginEvent }) => {
     initialValues: {
       email: "",
       password: "",
-      rememberMe: false,
     },
     validationSchema: yup.object({
       email: yup
@@ -48,7 +47,6 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({ loginEvent }) => {
         .min(5)
         .required("Email is required"),
       password: yup.string().min(7).max(20).required("Password is required"),
-      rememberMe: yup.boolean(),
     }),
     onSubmit: handleSubmit,
   });
@@ -91,18 +89,6 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({ loginEvent }) => {
             {formik.touched.password && formik.errors.password && (
               <p className="text-danger">{formik.errors.password}</p>
             )}
-          </div>
-
-          <div className="form-check mb-3">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              id="rememberMe"
-              name="rememberMe"
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.rememberMe}
-            />
           </div>
 
           <button

@@ -2,6 +2,10 @@ import { FunctionComponent, useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { getCardById } from "../services/cardsService";
 import { Card } from "../interfaces/cards/Card";
+import { customEncodeURIComponent } from "../utils/ui/customEncodeUriComponent";
+import axiosInstance from "../utils/interceptors/axios-interceptor";
+import { APIProvider, Map, Marker } from "@vis.gl/react-google-maps";
+
 interface BusinessinfoProps {}
 
 const Businessinfo: FunctionComponent<BusinessinfoProps> = () => {
@@ -10,6 +14,10 @@ const Businessinfo: FunctionComponent<BusinessinfoProps> = () => {
   const [card, setCard] = useState<Card | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const location = useLocation();
+  const GOOGLE_MAPS_API_KEY: string = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+  const [lat, setLat] = useState<number | null>(null);
+  const [lng, setLng] = useState<number | null>(null);
+  const [isMapLoading, setIsMapLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (id && location.state) {
@@ -28,7 +36,32 @@ const Businessinfo: FunctionComponent<BusinessinfoProps> = () => {
     } else {
       navigate("/cards");
     }
-  }, [id]);
+  }, [id, location.state, navigate]);
+
+  useEffect(() => {
+    if (card) {
+      setIsMapLoading(true);
+      const address = `${card.address.street} ${card.address.houseNumber} ${card.address.city} ${card.address.country}`;
+      const encodeAddress = customEncodeURIComponent(address);
+
+      axiosInstance
+        .get(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeAddress}`
+        )
+        .then((res) => {
+          if (res.data.length !== 0) {
+            // Use parseFloat instead of parseInt to preserve decimal points
+            setLat(parseFloat(res.data[0].lat));
+            setLng(parseFloat(res.data[0].lon));
+          }
+          setIsMapLoading(false);
+        })
+        .catch((err) => {
+          console.error("Error fetching coordinates:", err);
+          setIsMapLoading(false);
+        });
+    }
+  }, [card]);
 
   if (isLoading) {
     return (
@@ -43,6 +76,7 @@ const Businessinfo: FunctionComponent<BusinessinfoProps> = () => {
   if (!card) {
     return <div className="alert alert-danger">Business not found</div>;
   }
+
   return (
     <div className="container my-5">
       <div className="row">
@@ -87,7 +121,8 @@ const Businessinfo: FunctionComponent<BusinessinfoProps> = () => {
                 {card.address.street} {card.address.houseNumber},{" "}
                 {card.address.city}
                 <br />
-                {card.address.country}, {card.address.zip}
+                {card.address.country}
+                {card.address.zip ? `, ${card.address.zip}` : ""}
               </p>
             </div>
           </div>
@@ -110,6 +145,37 @@ const Businessinfo: FunctionComponent<BusinessinfoProps> = () => {
           >
             <i className="fas fa-arrow-left me-2"></i>Back
           </button>
+        </div>
+      </div>
+
+      {/* Map section */}
+      <div className="row mt-4">
+        <div className="col-12">
+          <h4>Location</h4>
+          {isMapLoading ? (
+            <div className="d-flex justify-content-center my-3">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Loading map...</span>
+              </div>
+            </div>
+          ) : lat !== null && lng !== null ? (
+            <div style={{ height: "400px", width: "100%", marginTop: "20px" }}>
+              <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
+                <Map
+                  defaultCenter={{ lat, lng }}
+                  defaultZoom={14}
+                  gestureHandling={"cooperative"}
+                  style={{ width: "100%", height: "100%" }}
+                >
+                  <Marker position={{ lat, lng }} />
+                </Map>
+              </APIProvider>
+            </div>
+          ) : (
+            <div className="alert alert-warning">
+              Could not load map coordinates for this address.
+            </div>
+          )}
         </div>
       </div>
     </div>

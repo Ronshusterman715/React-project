@@ -10,13 +10,15 @@ export const useJwtDecoder = (token: string | null) => {
       try {
         const decoded = jwtDecode(token);
 
-        if (decoded.exp && Date.now() / 1000 > decoded.exp) {
-          setError("token has expired");
-          setDecodedToken(null);
-        } else {
-          setDecodedToken(decoded);
-          setError(null);
-        }
+        // if (decoded.exp && Date.now() / 1000 > decoded.exp) {
+        //   setError("token has expired");
+        //   setDecodedToken(null);
+        // }
+        //  else {
+        localStorage.setItem("user", JSON.stringify(decoded));
+        setDecodedToken(decoded);
+        setError(null);
+        // }
       } catch (error) {
         setDecodedToken(null);
         setError(error);
