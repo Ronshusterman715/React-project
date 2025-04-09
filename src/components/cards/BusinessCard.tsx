@@ -47,44 +47,86 @@ const BusinessCard: FunctionComponent<BusinessCardProps> = ({
   };
 
   return (
-    <div className="card m-3" style={{ width: "18rem" }}>
-      <div onClick={handleCardClick}>
-        <img
-          className="card-img-top"
-          src={card.image.url}
-          alt={card.image.alt}
-        />
+    <div
+      className="card m-3 shadow-sm business-card"
+      style={{ width: "18rem", height: "100%" }}
+    >
+      <div onClick={handleCardClick} style={{ cursor: "pointer" }}>
+        <div
+          className="card-image-container"
+          style={{ height: "180px", overflow: "hidden" }}
+        >
+          <img
+            className="card-img-top"
+            src={card.image.url}
+            alt={card.image.alt}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "center",
+            }}
+          />
+        </div>
         <div className="card-body">
-          <h5 className="card-title">{card.title}</h5>
-          <h6 className="card-subtitle mb-2 text-muted">{card.subtitle}</h6>
+          <h5 className="card-title text-truncate">{card.title}</h5>
+          <h6 className="card-subtitle mb-2 text-muted text-truncate">
+            {card.subtitle}
+          </h6>
         </div>
         <ul className="list-group list-group-flush">
-          <li className="list-group-item ">
-            <span>Phone:</span>
-            <span>{card.phone}</span>
-            <br />
-            <span>Adress:</span>
-            <span>
-              {`${card.address.street} ${card.address.houseNumber}, ${card.address.city}`}
-            </span>
-            <br />
-            <span>Card Number:</span>
-            <span>{card.bizNumber}</span>
+          <li className="list-group-item px-3 py-2">
+            <div className="d-flex mb-1">
+              <span className="me-2">
+                <i className="fa-solid fa-phone fa-sm text-primary"></i>
+              </span>
+              <span className="text-truncate">{card.phone}</span>
+            </div>
+            <div className="d-flex mb-1">
+              <span className="me-2">
+                <i className="fa-solid fa-location-dot fa-sm text-primary"></i>
+              </span>
+              <span
+                className="text-truncate"
+                title={`${card.address.street} ${card.address.houseNumber}, ${card.address.city}, ${card.address.country}`}
+              >
+                {`${card.address.street} ${card.address.houseNumber}, ${card.address.city}`}
+              </span>
+            </div>
+            <div className="d-flex">
+              <span className="me-2">
+                <i className="fa-solid fa-hashtag fa-sm text-primary"></i>
+              </span>
+              <span>{card.bizNumber}</span>
+            </div>
           </li>
         </ul>
       </div>
-      <div className="card-body">
-        <a href={`tel:${card.phone}`}>
+      <div className="card-footer bg-white d-flex justify-content-around py-2 mt-auto">
+        <a
+          href={`tel:${card.phone}`}
+          className="btn btn-sm btn-outline-success"
+        >
           <i className="fa-solid fa-phone"></i>
         </a>
         {decodedToken &&
           decodedToken.isBusiness &&
           decodedToken._id === card.user_id && (
             <>
-              <a onClick={handleCardEditClick}>
+              <a
+                onClick={handleCardEditClick}
+                className="btn btn-sm btn-outline-warning"
+                title="Edit Card"
+                style={{ cursor: "pointer" }}
+              >
                 <i className="fa-solid fa-pen-to-square"></i>
               </a>
-              <a onClick={handleCardDeleteClick}>
+              <a
+                onClick={handleCardDeleteClick}
+                className="btn btn-sm btn-outline-danger"
+                title="Delete Card"
+                style={{ cursor: "pointer" }}
+              >
                 <i className="fa-solid fa-trash"></i>
               </a>
             </>

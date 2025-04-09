@@ -41,3 +41,31 @@
 .dark .form-check-label {
   color: #fff !important; /* Make all labels black in dark mode */
 }
+
+.business-card {
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+
+.business-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.card-img-container {
+  position: relative;
+  background-color: #f8f9fa;
+}
+
+.list-group-item .text-truncate {
+  max-width: 200px;
+}
+
+/* For responsive layout */
+@media (max-width: 768px) {
+  .business-card {
+    width: 100% !important;
+  }
+}
