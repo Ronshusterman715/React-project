@@ -6,10 +6,10 @@ interface NavbarProps {
   logoutEvent: () => void;
 }
 
-const Navbar: FunctionComponent<NavbarProps> = ({
-  logoutEvent,
-}) => {
-  const user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")!) : null;
+const Navbar: FunctionComponent<NavbarProps> = ({ logoutEvent }) => {
+  const user = localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user")!)
+    : null;
   const [searchText, setSearchText] = useState<string | null>(null);
   const navigate = useNavigate();
   const context = useContext(ThemeContext);
@@ -59,7 +59,6 @@ const Navbar: FunctionComponent<NavbarProps> = ({
 
           {/* Collapsible Content */}
           <div className="collapse navbar-collapse" id="navbarContent">
-            {/* Left Links */}
             <ul className="navbar-nav me-auto">
               <li className="nav-item">
                 <NavLink

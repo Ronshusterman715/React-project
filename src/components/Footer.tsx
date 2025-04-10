@@ -1,7 +1,6 @@
 import { FunctionComponent } from "react";
 
-interface FooterProps {
-}
+interface FooterProps {}
 
 const Footer: FunctionComponent<FooterProps> = () => {
   const user = localStorage.getItem("user")
@@ -32,12 +31,50 @@ const Footer: FunctionComponent<FooterProps> = () => {
                     About
                   </a>
                 </li>
+                {user && (
+                  <>
+                    <li>
+                      <a href="/favcards" className="text-light">
+                        Fav Cards
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href={`/users/${user._id}/edit`}
+                        className="text-light"
+                      >
+                        Account Details
+                      </a>
+                    </li>
+                  </>
+                )}
                 {user && user.isBusiness && (
-                  <li>
-                    <a href="/favcards" className="text-light">
-                      Fav Cards
-                    </a>
-                  </li>
+                  <>
+                    <li>
+                      <a href="/cards/create" className="text-light">
+                        Create Card
+                      </a>
+                    </li>
+                    <li>
+                      <a href="/mycards" className="text-light">
+                        My Cards
+                      </a>
+                    </li>
+                  </>
+                )}
+                {!user && (
+                  <>
+                    <li>
+                      <a href="/login" className="text-light">
+                        Login
+                      </a>
+                    </li>
+                    <li>
+                      <a href="/register" className="text-light">
+                        Register
+                      </a>
+                    </li>
+                  </>
                 )}
                 <li>
                   <a href="/contact" className="text-light">

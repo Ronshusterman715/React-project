@@ -4,7 +4,7 @@ import AboutUserGuide from "./about/AboutUserGuide";
 import AboutTechStack from "./about/AboutTechStack";
 import AboutApi from "./about/AboutApi";
 import AboutContact from "./about/AboutContact";
-import AboutIntro from "./about/Aboutintro";
+import AboutIntro from "./about/AboutIntro";
 import AboutFeatures from "./about/AboutFeatures";
 
 interface AboutProps {}
