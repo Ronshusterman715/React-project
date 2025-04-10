@@ -92,7 +92,7 @@ const Navbar: FunctionComponent<NavbarProps> = ({ logoutEvent }) => {
                       Account Details
                     </NavLink>
                   </li>
-                  {user && user.isBusiness && (
+                  {user && (user.isBusiness || user.isAdmin) && (
                     <>
                       <li className="nav-item">
                         <NavLink

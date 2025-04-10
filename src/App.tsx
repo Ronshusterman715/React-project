@@ -13,14 +13,17 @@ import { ThemeProvider } from "./context/ThemeContext";
 import Mycards from "./components/Mycards";
 import Favoritecards from "./components/Favoritecards";
 import About from "./components/About";
+import NotFound from "./components/NotFound";
+import { useJwtDecoder } from "./hooks/useJwtDecoder";
 
 function App() {
   const [jwtToken, setJwtToken] = useState<string | null>(
     localStorage.getItem("token")
   );
 
-  useEffect(() => {}, [jwtToken]);
+  useJwtDecoder(jwtToken);
 
+  useEffect(() => {}, [jwtToken]);
   const loginEvent = () => {
     setJwtToken(localStorage.getItem("token"));
   };
@@ -66,6 +69,7 @@ function App() {
             <Route path="/mycards" element={<Mycards />} />
             <Route path="/favcards" element={<Favoritecards />} />
             <Route path="about" element={<About />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
           <Footer />
         </ThemeProvider>

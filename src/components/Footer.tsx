@@ -48,7 +48,7 @@ const Footer: FunctionComponent<FooterProps> = () => {
                     </li>
                   </>
                 )}
-                {user && user.isBusiness && (
+                {user && (user.isBusiness || user.isAdmin) && (
                   <>
                     <li>
                       <a href="/cards/create" className="text-light">
@@ -76,11 +76,6 @@ const Footer: FunctionComponent<FooterProps> = () => {
                     </li>
                   </>
                 )}
-                <li>
-                  <a href="/contact" className="text-light">
-                    Contact
-                  </a>
-                </li>
               </ul>
             </div>
             <div className="col-md-4">
