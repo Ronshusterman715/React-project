@@ -2,6 +2,7 @@ import { FunctionComponent, useEffect, useState } from "react";
 import BusinessCard from "./cards/BusinessCard";
 import { Card } from "../interfaces/cards/Card";
 import { getAllMyCards } from "../services/cardsService";
+import { errorMessage } from "../utils/ui/alert";
 
 interface MycardsProps {
 }
@@ -19,7 +20,7 @@ const Mycards: FunctionComponent<MycardsProps> = () => {
         .then((res) => {
           setMyCards(res.data);
         })
-        .catch((err) => console.log(err));
+        .catch((err) => errorMessage(err));
     }
     setIsCardLoading(false);
   }, []);

@@ -3,6 +3,7 @@ import { getAllCards } from "../services/cardsService";
 import BusinessCard from "./cards/BusinessCard";
 import { Card } from "../interfaces/cards/Card";
 import { useLocation } from "react-router-dom";
+import { errorMessage } from "../utils/ui/alert";
 interface CardsProps {
 }
 
@@ -29,7 +30,7 @@ const Cards: FunctionComponent<CardsProps> = () => {
             setFilteredCards(res.data);
           }
         })
-        .catch((err) => console.log(err));
+        .catch((err) => errorMessage(err));
     } else if (searchQuery) {
       const filteredCards = cards.filter((card: Card) =>
         card.title.toLowerCase().includes(searchQuery.toLowerCase())

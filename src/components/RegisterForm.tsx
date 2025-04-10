@@ -67,7 +67,6 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = ({
         errorMessage("failed to create user");
       }
     } catch (err: any) {
-      console.log(err);
       if (err.response.data)
         errorMessage(`failed to create user - ${err.response.data}`);
       else {
@@ -88,7 +87,6 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = ({
         errorMessage("failed to updated user");
       }
     } catch (err: any) {
-      console.log(err);
       if (err.response.data)
         errorMessage(`failed to updated user - ${err.response.data}`);
       else {

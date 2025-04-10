@@ -2,6 +2,7 @@ import { FunctionComponent, useEffect, useState } from "react";
 import { Card } from "../interfaces/cards/Card";
 import { getAllCards } from "../services/cardsService";
 import BusinessCard from "./cards/BusinessCard";
+import { errorMessage } from "../utils/ui/alert";
 
 interface FavoritecardsProps {
 }
@@ -22,7 +23,7 @@ const Favoritecards: FunctionComponent<FavoritecardsProps> = () => {
           );
           setFavoriteCards(filteredCards);
         })
-        .catch((err) => console.log(err));
+        .catch((err) => errorMessage(err));
     }
     setIsCardLoading(false);
   }, []);

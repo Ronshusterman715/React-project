@@ -26,7 +26,7 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({ loginEvent }) => {
         errorMessage("failed to login");
       }
     } catch (err: any) {
-      console.log(err);
+      errorMessage(err);
       if (err.response.data)
         errorMessage(`failed to login - ${err.response.data}`);
       else {

@@ -18,13 +18,12 @@ import Footer from "./components/Footer";
 import { ThemeProvider } from "./context/ThemeContext";
 import Mycards from "./components/Mycards";
 import Favoritecards from "./components/Favoritecards";
+import About from "./components/About";
 
 function App() {
   const [jwtToken, setJwtToken] = useState<string | null>(
     localStorage.getItem("token")
   );
-
-  // const { decodedToken, error } = useJwtDecoder(jwtToken);
 
   useEffect(() => {}, [jwtToken]);
 
@@ -72,6 +71,7 @@ function App() {
             <Route path="/businessinfo/:id/" element={<Businessinfo />} />
             <Route path="/mycards" element={<Mycards />} />
             <Route path="/favcards" element={<Favoritecards />} />
+            <Route path="about" element={<About />} />
           </Routes>
           <Footer />
         </ThemeProvider>

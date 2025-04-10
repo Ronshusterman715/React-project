@@ -65,7 +65,6 @@ const Cardform: FunctionComponent<CardformProps> = ({ isCreateMode }) => {
         errorMessage("failed to create card");
       }
     } catch (err: any) {
-      console.log(err);
       if (err.response.data)
         errorMessage(`failed to create card - ${err.response.data}`);
       else {
@@ -85,7 +84,6 @@ const Cardform: FunctionComponent<CardformProps> = ({ isCreateMode }) => {
         errorMessage("failed to update card");
       }
     } catch (err: any) {
-      console.log(err);
       if (err.response.data)
         errorMessage(`failed to update card - ${err.response.data}`);
       else {

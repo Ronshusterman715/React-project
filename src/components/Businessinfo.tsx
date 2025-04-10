@@ -50,7 +50,6 @@ const Businessinfo: FunctionComponent<BusinessinfoProps> = () => {
         )
         .then((res) => {
           if (res.data.length !== 0) {
-            // Use parseFloat instead of parseInt to preserve decimal points
             setLat(parseFloat(res.data[0].lat));
             setLng(parseFloat(res.data[0].lon));
           }

@@ -27,6 +27,14 @@ const BusinessCard: FunctionComponent<BusinessCardProps> = ({
   };
 
   const handleCardDeleteClick = async () => {
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete this card?"
+    );
+
+    if (!isConfirmed) {
+      return;
+    }
+
     let deleteCardResponse = null;
     try {
       deleteCardResponse = await deleteCard(card._id!);
@@ -37,14 +45,12 @@ const BusinessCard: FunctionComponent<BusinessCardProps> = ({
         errorMessage("failed to delete card");
       }
     } catch (err: any) {
-      console.log(err);
       if (err.response.data)
         errorMessage(`failed to delete card - ${err.response.data}`);
       else {
         errorMessage(`failed to delete card`);
       }
     }
-    // navigate("/cards");
   };
 
   const handleCardEditClick = () => {
@@ -66,7 +72,6 @@ const BusinessCard: FunctionComponent<BusinessCardProps> = ({
         errorMessage("failed to like/unlike card");
       }
     } catch (err: any) {
-      console.log(err);
       if (err.response.data)
         errorMessage(`failed to like/unlike card - ${err.response.data}`);
       else {
